@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rust SQL Base</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+        }
+        
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            text-align: center;
+            max-width: 600px;
+            margin: 2rem;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+        
+        .feature {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1.5rem;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .feature h3 {
+            margin: 0 0 0.5rem 0;
+            color: #4ecdc4;
+        }
+        
+        .api-section {
+            margin: 2rem 0;
+            padding: 1.5rem;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            border-left: 4px solid #4ecdc4;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: transform 0.3s ease;
+            margin: 0.5rem;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        #usersList {
+            text-align: left;
+            margin-top: 1rem;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .user-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.8rem;
+            margin: 0.5rem 0;
+            border-radius: 8px;
+            border-left: 3px solid #4ecdc4;
+        }
+        
+        .loading {
+            color: #4ecdc4;
+            font-style: italic;
+        }
+        
+        .error {
+            color: #ff6b6b;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🦀 Rust SQL Base</h1>
+        <p class="subtitle">API moderna con Rust, Axum y PostgreSQL</p>
+        
+        <div class="features">
+            <div class="feature">
+                <h3>⚡ Alta Performance</h3>
+                <p>Construido con Rust para máxima velocidad y seguridad</p>
+            </div>
+            <div class="feature">
+                <h3>🗄️ PostgreSQL</h3>
+                <p>Base de datos robusta con SQLx para consultas async</p>
+            </div>
+            <div class="feature">
+                <h3>🚀 Docker Ready</h3>
+                <p>Imagen mínima lista para producción</p>
+            </div>
+            <div class="feature">
+                <h3>💾 Cache Local</h3>
+                <p>Sistema de caché en memoria para optimizar rendimiento</p>
+            </div>
+        </div>
+        
+        <div class="api-section">
+            <h3>🔗 API Endpoints</h3>
+            <p><strong>GET /users</strong> - Obtener lista de usuarios</p>
+            <p>Parámetros opcionales: <code>?limit=10</code></p>
+            
+            <a href="/users" class="btn" target="_blank">Ver Usuarios</a>
+            <a href="/users?limit=5" class="btn" target="_blank">Ver 5 Usuarios</a>
+            <button class="btn" onclick="loadUsers()">Cargar Usuarios Aquí</button>
+            
+            <div id="usersList"></div>
+        </div>
+        
+        <p style="margin-top: 2rem; opacity: 0.7;">
+            Creado con ❤️ usando Rust + Axum + PostgreSQL
+        </p>
+    </div>
+
+    <script>
+        async function loadUsers() {
+            const usersList = document.getElementById('usersList');
+            usersList.innerHTML = '<div class="loading">Cargando usuarios...</div>';
+            
+            try {
+                console.log('Haciendo petición a /users?limit=10');
+                const response = await fetch('/users?limit=10');
+                console.log('Status de respuesta:', response.status);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                console.log('Respuesta completa de la API:', data);
+                
+                if (data.status === 'success' && data.data && data.data.length > 0) {
+                    console.log(`Encontrados ${data.data.length} usuarios`);
+                    usersList.innerHTML = data.data.map(user => `
+                        <div class="user-item">
+                            <strong>${user.name}</strong> (${user.email})<br>
+                            <small>ID: ${user.id} | Creado: ${new Date(user.created_at).toLocaleDateString()}</small>
+                        </div>
+                    `).join('');
+                } else if (data.status === 'success' && data.data && data.data.length === 0) {
+                    usersList.innerHTML = '<div class="error">No hay usuarios en la base de datos</div>';
+                } else if (data.status === 'error') {
+                    usersList.innerHTML = `<div class="error">Error de API: ${data.message}</div>`;
+                } else {
+                    console.error('Estructura de respuesta inesperada:', data);
+                    usersList.innerHTML = '<div class="error">Respuesta inesperada de la API</div>';
+                }
+            } catch (error) {
+                console.error('Error completo:', error);
+                usersList.innerHTML = `<div class="error">Error de conexión: ${error.message}</div>`;
+            }
+        }
+    </script>
+</body>
+</html>

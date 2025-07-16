@@ -1,0 +1,33 @@
+# Rust
+/backend/target/
+**/*.rs.bk
+Cargo.lock
+
+# IDE
+.vscode/
+.idea/
+
+# Docker
+.docker/
+
+# Database
+postgres_data/
+
+# Logs
+*.log
+
+# Environment variables (keep .env.example, ignore .env)
+.env.local
+.env.production
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+
+# Build artifacts
+dist/
+build/
