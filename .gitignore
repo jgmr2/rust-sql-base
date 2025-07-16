@@ -17,6 +17,7 @@ postgres_data/
 *.log
 
 # Environment variables (keep .env.example, ignore .env)
+.env
 .env.local
 .env.production
 
